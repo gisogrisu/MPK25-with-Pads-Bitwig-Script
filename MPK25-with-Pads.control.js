@@ -4,6 +4,7 @@
  *	- CCs for Pads from 36 to at least 47 (if you just want to use Pad Bank A) or up to 83
  * 		( PAD 10 : 36, PAD 7 : 37, ..., PAD 11 : 40, ... )
  * - Launching of Clips does follow the selected Layout (Arrange View, Mix View)
+ * - CCs for knobs have to be on midi channel 1!
  * 
  *TODO:
  * 	Get Channel volume and increment/decrement
@@ -137,13 +138,14 @@ function init()
 
 function onMidi(status, data1, data2)
 {
-	var pressed = data2 > 64; // ignore button release
 	
 	// DEBUG
 	//host.showPopupNotification("status: "+status+", data1: "+data1+", data2: "+data2);
 	
+	var pressed = data2 > 64; // ignore button release
+	
 	// Pads (CH 2A: CC36 - 83)
-	if (status & 0x1)
+	if (MIDIChannel(status) == 1)
 	{
 		pressed = data2 > 0;
     
@@ -165,8 +167,8 @@ function onMidi(status, data1, data2)
 		}
 	}
 
-	// Knobs, switches and transport
-	else if (isChannelController(status)) {
+	// Knobs, switches and transport (just CH 1)
+	else if (isChannelController(status) && (MIDIChannel(status) == 0)) {
 
 		/*if (data1 >= CC.K5A && data1 < CC.K5A + 8)
 		{
